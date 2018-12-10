@@ -1,5 +1,6 @@
 package hr.fer.apr.lab1
 
+import hr.fer.apr.lab1.util.Matrix
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import java.lang.IllegalArgumentException
@@ -11,8 +12,8 @@ class MatrixTest {
         val matrix = Matrix("files/lab1/A2.txt")
         assert(matrix.equals(
                 Matrix(arrayOf(doubleArrayOf(3.0, 9.0, 6.0),
-                               doubleArrayOf(4.0, 12.0, 12.0),
-                               doubleArrayOf(1.0, -1.0, 1.0))
+                        doubleArrayOf(4.0, 12.0, 12.0),
+                        doubleArrayOf(1.0, -1.0, 1.0))
                 )), {  -> "Expected equal" })
     }
 
@@ -29,8 +30,8 @@ class MatrixTest {
     fun testSize() {
         assertEquals(
                 Matrix(arrayOf(doubleArrayOf(3.0, 9.0),
-                               doubleArrayOf(4.0, 12.0),
-                               doubleArrayOf(1.0, -1.0))
+                        doubleArrayOf(4.0, 12.0),
+                        doubleArrayOf(1.0, -1.0))
                 ).size(),
                 Pair(3, 2))
 
@@ -62,16 +63,16 @@ class MatrixTest {
     @Test(expected = IllegalArgumentException::class)
     fun testGetVectorIllegalIndex() {
         val vector = Matrix(arrayOf(doubleArrayOf(3.0),
-                                    doubleArrayOf(4.0),
-                                    doubleArrayOf(5.0)))
+                doubleArrayOf(4.0),
+                doubleArrayOf(5.0)))
         vector.get(3)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun testGetVectorIllegalNegativeIndex() {
         val vector = Matrix(arrayOf(doubleArrayOf(3.0),
-                                    doubleArrayOf(4.0),
-                                    doubleArrayOf(5.0)))
+                doubleArrayOf(4.0),
+                doubleArrayOf(5.0)))
         vector.get(-1)
     }
 

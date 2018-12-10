@@ -1,6 +1,6 @@
-package hr.fer.apr.lab1
+package hr.fer.apr.lab1.task
 
-import hr.fer.apr.lab1.Matrix
+import hr.fer.apr.lab1.util.Matrix
 
 fun main(args: Array<String>) {
     val A = Matrix("files/lab1/A3.txt")

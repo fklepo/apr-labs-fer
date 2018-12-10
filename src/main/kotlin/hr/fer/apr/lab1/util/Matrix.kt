@@ -1,4 +1,4 @@
-package hr.fer.apr.lab1
+package hr.fer.apr.lab1.util
 
 import java.io.File
 import java.lang.IllegalArgumentException
@@ -11,11 +11,34 @@ val EPSILON = 1e-6
 class Matrix {
 
     companion object {
-        fun deepCopy(arr: Array<DoubleArray>): Array<DoubleArray> {
+        fun identity(n: Int): Matrix {
+            if(n < 1) {
+                throw IllegalArgumentException("Dimension must be at least 1.")
+            }
+
+            val elems = ArrayList<DoubleArray>()
+
+            Collections.nCopies(n, DoubleArray(n)).map { it.copyOf() }.forEach { elems.add(it) }
+            (0..n-1).asSequence().forEach { elems[it][it] = 1.0 }
+
+            return Matrix(elems.toTypedArray())
+        }
+
+        fun parse(file: File): Matrix {
+            val elems = arrayListOf<DoubleArray>()
+
+            for(line in file.readLines()) {
+                elems.add(line.trim().replace("//s+", " ").split(" ").map { it.toDouble() }.toDoubleArray())
+            }
+
+            return Matrix(elems.toTypedArray())
+        }
+
+        private fun deepCopy(arr: Array<DoubleArray>): Array<DoubleArray> {
             return arr.map { it.clone() }.toTypedArray()
         }
 
-        fun doubleEquals(d1: Double, d2: Double): Boolean {
+        private fun doubleEquals(d1: Double, d2: Double): Boolean {
             return abs(d1 - d2) < EPSILON
         }
     }
@@ -122,11 +145,15 @@ class Matrix {
         }
 
         return Matrix(
-                elems.map { row -> IntRange(0, other.size().second - 1)
-                                    .map { other.getCol(it) }
-                                    .map { row.zip(it).map { it.first * it.second }
-                                                      .reduce { a, i -> a + i } }
-                                                      .toDoubleArray() }.toTypedArray())
+                elems.map { row ->
+                    IntRange(0, other.size().second - 1)
+                            .map { other.getCol(it) }
+                            .map {
+                                row.zip(it).map { it.first * it.second }
+                                        .reduce { a, i -> a + i }
+                            }
+                            .toDoubleArray()
+                }.toTypedArray())
     }
 
     operator fun times(c: Double): Matrix {
@@ -137,7 +164,7 @@ class Matrix {
         return Matrix(elems.map { it.map { x -> x / c }.toDoubleArray() }.toTypedArray())
     }
 
-    private fun getCol(i: Int): DoubleArray {
+    fun getCol(i: Int): DoubleArray {
         if(i < 0 || i >= size().second) {
             throw IllegalArgumentException("Index out of range.")
         }
@@ -145,18 +172,16 @@ class Matrix {
         return elems.map { it.get(i) }.toDoubleArray()
     }
 
-    fun transpose(): Matrix {
-        return Matrix(IntRange(0, size().second - 1).map { getCol(it) }.toTypedArray())
-    }
-
-    fun parse(file: File): Matrix {
-        val elems = arrayListOf<DoubleArray>()
-
-        for(line in file.readLines()) {
-            elems.add(line.trim().replace("//s+", " ").split(" ").map { it.toDouble() }.toDoubleArray())
+    fun getColAsMatrix(i: Int): Matrix {
+        if(i < 0 || i >= size().second) {
+            throw IllegalArgumentException("Index out of range.")
         }
 
-        return Matrix(elems.toTypedArray())
+        return Matrix(arrayOf(elems.map { it.get(i) }.toDoubleArray())).transpose()
+    }
+
+    fun transpose(): Matrix {
+        return Matrix(IntRange(0, size().second - 1).map { getCol(it) }.toTypedArray())
     }
 
     fun toFile(file: File) {
@@ -171,7 +196,7 @@ class Matrix {
             throw IllegalArgumentException("Invalid row position ${row2}.")
         }
 
-        val newElems = Matrix.deepCopy(elems)
+        val newElems = deepCopy(elems)
         val copy = newElems[row1]
         newElems[row1] = newElems[row2]
         newElems[row2] = copy
@@ -238,25 +263,12 @@ class Matrix {
         return x
     }
 
-    fun identity(n: Int): Matrix {
-        if(n < 1) {
-            throw IllegalArgumentException("Dimension must be at least 1.")
-        }
-
-        val elems = ArrayList<DoubleArray>()
-
-        Collections.nCopies(n, DoubleArray(n)).map { it.copyOf() }.forEach { elems.add(it) }
-        (0..n-1).asSequence().forEach { elems[it][it] = 1.0 }
-
-        return Matrix(elems.toTypedArray())
-    }
-
     fun luDecompose(): Matrix {
         if(this.size().let { it.first != it.second }) {
             throw UnsupportedOperationException("LU decomposition is not defined for non-squared matrices.")
         }
 
-        val lu = Matrix(Matrix.deepCopy(this.elems))
+        val lu = Matrix(deepCopy(this.elems))
 
         for (k in 0..lu.size().first-2) {
             if(Math.abs(lu[k, k]).compareTo(EPSILON) < 0) {
@@ -278,7 +290,7 @@ class Matrix {
             throw UnsupportedOperationException("LUP decomposition is not defined for non-squared matrices.")
         }
 
-        var lup = Matrix(Matrix.deepCopy(this.elems))
+        var lup = Matrix(deepCopy(this.elems))
         var perm = identity(lup.size().first)
 
         for (k in 0..lup.size().first - 2) {
@@ -305,6 +317,10 @@ class Matrix {
         }
 
         return Pair(lup, perm)
+    }
+
+    fun copy(): Matrix {
+        return Matrix(Matrix.deepCopy(this.elems))
     }
 
     override fun toString(): String {
