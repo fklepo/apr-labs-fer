@@ -1,6 +1,6 @@
 package hr.fer.apr.lab1.task
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 
 fun main(args: Array<String>) {
     var matrix = Matrix(arrayOf(doubleArrayOf(3.412, 2.321, 5.59)))

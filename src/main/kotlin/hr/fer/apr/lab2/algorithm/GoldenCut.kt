@@ -1,7 +1,7 @@
 package hr.fer.apr.lab2.algorithm
 
-import hr.fer.apr.lab2.util.InputParser
-import hr.fer.apr.lab2.util.toDouble
+import hr.fer.apr.util.InputParser
+import hr.fer.apr.util.toDouble
 import java.util.Optional
 
 val E = 1e-6
@@ -83,11 +83,11 @@ class GoldenCut {
             return Pair(mA, mB)
         }
 
-        fun evaluate(f: (Double) -> Double, start: Double, h: Double = H, e: Double = E, verbose: Boolean = true): Pair<Double, Double> {
+        fun evaluate(f: (Double) -> Double, start: Double, h: Double = H, e: Double = E, verbose: Boolean = false): Pair<Double, Double> {
             return evaluate(f, unimodalInterval(f, start, h), e, verbose = verbose)
         }
 
-        fun evaluate(f: (Double) -> Double, propertiesPath: String? = null, verbose: Boolean = true): Pair<Double, Double> {
+        fun evaluate(f: (Double) -> Double, propertiesPath: String? = null, verbose: Boolean = false): Pair<Double, Double> {
             var propertiesMap: Map<String, String> = HashMap<String, String>()
             if (propertiesPath != null) {
                 propertiesMap = InputParser.readPropertiesFile(propertiesPath)

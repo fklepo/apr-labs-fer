@@ -1,10 +1,14 @@
 package hr.fer.apr.lab2.function
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 
-interface MultivariableFunction {
+abstract class MultivariableFunction {
 
-    fun numberOfCalls(): Int
+    var numberOfCalls = 0
 
-    fun evaluate(x: Matrix): Double
+    fun numberOfCalls(): Int {
+        return numberOfCalls
+    }
+
+    abstract operator fun invoke(x: Matrix): Double
 }

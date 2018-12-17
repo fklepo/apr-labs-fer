@@ -1,6 +1,5 @@
-package hr.fer.apr.lab1
+package hr.fer.apr.util
 
-import hr.fer.apr.lab1.util.Matrix
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 import java.lang.IllegalArgumentException
@@ -156,5 +155,30 @@ class MatrixTest {
         val b = Matrix(arrayOf(doubleArrayOf(10.3, 12.5, 0.1))).transpose()
         println(A.forwardSubstitution(b))
         assertEquals(1, 1)
+    }
+
+    @Test
+    fun testConcat() {
+        val A = Matrix(arrayOf(
+                doubleArrayOf(1.0, 0.0, 0.0),
+                doubleArrayOf(0.6, 1.0, 0.0),
+                doubleArrayOf(0.2, 0.571, 1.0)))
+        val b = Matrix(arrayOf(doubleArrayOf(10.0, 12.0, 1.0)))
+        val concatMatrix = A.concat(b.transpose(), vertically = true)
+        assertEquals(10.0, concatMatrix[0, 3])
+        assertEquals(Pair(3, 4), concatMatrix.size())
+
+        val concatMatrix2 = A.concat(b)
+        assertEquals(12.0, concatMatrix2[3, 1])
+        assertEquals(Pair(4, 3), concatMatrix2.size())
+    }
+
+    @Test
+    fun testInverse() {
+        val A = Matrix(arrayOf(
+                doubleArrayOf(1.0, 0.0, 0.0),
+                doubleArrayOf(0.6, 1.0, 0.0),
+                doubleArrayOf(0.2, 0.571, 1.0)))
+        A.inverse()
     }
 }

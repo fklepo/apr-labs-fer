@@ -1,7 +1,7 @@
 package hr.fer.apr.lab2.algorithm
 
-import hr.fer.apr.lab1.util.Matrix
-import hr.fer.apr.lab2.util.InputParser
+import hr.fer.apr.util.Matrix
+import hr.fer.apr.util.InputParser
 import hr.fer.apr.lab2.function.MultivariableFunction
 import java.util.*
 
@@ -26,7 +26,7 @@ class CoordinateAxisSearch {
                 for(i in (0..x.size().first-1)) {
                     val identityVectorI = Matrix.identity(x.size().first).getColAsMatrix(i)
                     val lMinTuple = GoldenCut.evaluate(
-                            { l -> f.evaluate(x + identityVectorI * l) },
+                            { l -> f.invoke(x + identityVectorI * l) },
                             xS[i],
                             verbose=verbose)
                     val lMin = lMinTuple.let { (it.first + it.second) / 2 }

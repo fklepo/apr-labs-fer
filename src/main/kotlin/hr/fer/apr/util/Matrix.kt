@@ -1,4 +1,4 @@
-package hr.fer.apr.lab1.util
+package hr.fer.apr.util
 
 import java.io.File
 import java.lang.IllegalArgumentException
@@ -34,12 +34,16 @@ class Matrix {
             return Matrix(elems.toTypedArray())
         }
 
-        private fun deepCopy(arr: Array<DoubleArray>): Array<DoubleArray> {
+        fun deepCopy(arr: Array<DoubleArray>): Array<DoubleArray> {
             return arr.map { it.clone() }.toTypedArray()
         }
 
         private fun doubleEquals(d1: Double, d2: Double): Boolean {
             return abs(d1 - d2) < EPSILON
+        }
+
+        fun vector(vararg elems: Double): Matrix {
+            return Matrix(arrayOf(elems)).transpose()
         }
     }
 
@@ -74,7 +78,7 @@ class Matrix {
     }
 
     operator fun get(i: Int): Double {
-        if (!1.equals(size().second)) {
+        if (size().second != 1) {
             throw UnsupportedOperationException("Operation is supported for row vectors only.")
         }
         if ((i < 0 || i >= size().first)) {
@@ -320,10 +324,49 @@ class Matrix {
     }
 
     fun copy(): Matrix {
-        return Matrix(Matrix.deepCopy(this.elems))
+        return Matrix(deepCopy(this.elems))
+    }
+
+    fun norm(): Double {
+        if (size().second != 1) {
+            throw java.lang.UnsupportedOperationException("Norms are defined for vectors only!")
+        }
+        return Math.sqrt(this.elems.map { it[0] * it[0] }.sum())
+    }
+
+    fun concat(other: Matrix, vertically: Boolean = false): Matrix {
+        val copy = this.copy()
+        val otherCopy = other.copy()
+
+        if (vertically) {
+            return Matrix(copy.elems.zip(otherCopy.elems).map { it.first + it.second }.toTypedArray())
+        } else {
+            return Matrix(copy.elems + otherCopy.elems)
+        }
+    }
+
+    fun inverse(): Matrix? {
+        val size = size()
+        if (size.first != size.second) {
+            throw java.lang.UnsupportedOperationException("Inverse is defined for square matrices only!")
+        }
+        // A * A^-1 = I
+        // A * xi = Ei
+        // X = [x1, ..., xn] = A^-1
+        val lupDecompose = this.lupDecompose()
+        return (0..size.first-1)
+                .map { Matrix.identity(size.first).getColAsMatrix(it) }
+                .map {
+                    val y = lupDecompose.first.forwardSubstitution(lupDecompose.second * it)
+                    lupDecompose.first.backSubstitution(y)
+                }
+                .reduceRight({ cur, acc -> acc.concat(cur, vertically = true) })
     }
 
     override fun toString(): String {
+        if (this.size().second == 1) {
+            return this.transpose().toString()
+        }
         return elems.map { it.joinToString(separator = " ") }.joinToString(separator = System.lineSeparator())
     }
 

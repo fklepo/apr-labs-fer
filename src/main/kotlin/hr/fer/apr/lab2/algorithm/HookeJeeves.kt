@@ -1,9 +1,9 @@
 package hr.fer.apr.lab2.algorithm
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 import hr.fer.apr.lab2.function.MultivariableFunction
-import hr.fer.apr.lab2.util.InputParser
-import hr.fer.apr.lab2.util.toDouble
+import hr.fer.apr.util.InputParser
+import hr.fer.apr.util.toDouble
 import java.util.*
 
 val D_X = 1.0
@@ -14,13 +14,13 @@ class HookeJeeves {
         private fun explore(f: MultivariableFunction, xP: Matrix, dX: Double): Matrix {
             val x = xP.copy()
             for(i in (0..xP.size().first - 1)) {
-                val p = f.evaluate(x)
+                val p = f.invoke(x)
                 x[i] += dX
-                var n = f.evaluate(x)
+                var n = f.invoke(x)
 
                 if(n.compareTo(p) > 0) {
                     x[i] -= 2 * dX
-                    n = f.evaluate(x)
+                    n = f.invoke(x)
                     if(n.compareTo(p) > 0) {
                         x[i] += dX
                     }
@@ -50,9 +50,9 @@ class HookeJeeves {
             do {
                 val xN = explore(f, xPc, dXc)
                 if (verbose) {
-                    println("${step++}: xB = ${xBc}, xP = ${xPc}, xN = ${xN}, f(xN) < f(xB) = ${f.evaluate(xN).compareTo(f.evaluate(xBc)) < 0}")
+                    println("${step++}: xB = ${xBc}, xP = ${xPc}, xN = ${xN}, f(xN) < f(xB) = ${f.invoke(xN).compareTo(f.invoke(xBc)) < 0}")
                 }
-                if(f.evaluate(xN).compareTo(f.evaluate(xBc)) < 0) {
+                if(f.invoke(xN).compareTo(f.invoke(xBc)) < 0) {
                     xPc = (xN * 2.0) - xBc
                     xBc = xN.copy()
                 } else {

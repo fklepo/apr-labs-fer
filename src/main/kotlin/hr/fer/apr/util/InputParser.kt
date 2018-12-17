@@ -1,6 +1,5 @@
-package hr.fer.apr.lab2.util
+package hr.fer.apr.util
 
-import hr.fer.apr.lab1.util.Matrix
 import java.lang.IllegalArgumentException
 import java.nio.file.Files
 import java.nio.file.Paths

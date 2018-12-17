@@ -1,6 +1,6 @@
 package hr.fer.apr.lab2.task
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 import hr.fer.apr.lab2.algorithm.CoordinateAxisSearch
 import hr.fer.apr.lab2.algorithm.HookeJeeves
 import hr.fer.apr.lab2.algorithm.NelderMeadSimplex

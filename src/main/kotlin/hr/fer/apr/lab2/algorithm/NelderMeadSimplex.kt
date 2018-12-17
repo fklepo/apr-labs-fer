@@ -1,9 +1,9 @@
 package hr.fer.apr.lab2.algorithm
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 import hr.fer.apr.lab2.function.MultivariableFunction
-import hr.fer.apr.lab2.util.InputParser
-import hr.fer.apr.lab2.util.toDouble
+import hr.fer.apr.util.InputParser
+import hr.fer.apr.util.toDouble
 import java.util.*
 
 val NM_E = 1e-6
@@ -16,15 +16,15 @@ val SIGMA = 0.5
 class NelderMeadSimplex {
 
     companion object {
-        private fun reflect(xC: Matrix, xH: Matrix, alpha: Double): Matrix {
+        public fun reflect(xC: Matrix, xH: Matrix, alpha: Double): Matrix {
             return xC * (1 + alpha) - xH * alpha
         }
 
-        private fun expand(xC: Matrix, xR: Matrix, gamma: Double): Matrix {
+        public fun expand(xC: Matrix, xR: Matrix, gamma: Double): Matrix {
             return xC * (1 - gamma) + xR * gamma
         }
 
-        private fun contract(xC: Matrix, xH: Matrix, beta: Double): Matrix {
+        public fun contract(xC: Matrix, xH: Matrix, beta: Double): Matrix {
             return xC * (1 - beta) + xH * beta
         }
 
@@ -39,19 +39,19 @@ class NelderMeadSimplex {
             return result
         }
 
-        private fun stoppageCriteriaMet(f: MultivariableFunction, simplexPoints: List<Matrix>, epsilon: Double): Boolean {
+        public fun stoppageCriteriaMet(f: MultivariableFunction, simplexPoints: List<Matrix>, epsilon: Double): Boolean {
             val simplexPointsValuesByIndex = (0..simplexPoints.size-1)
                     .zip(simplexPoints)
-                    .map { (i, xi) -> Pair(i, f.evaluate(xi)) }
+                    .map { (i, xi) -> Pair(i, f.invoke(xi)) }
 
             val h = simplexPointsValuesByIndex.maxBy { it.second }!!.first
             val l = simplexPointsValuesByIndex.minBy { it.second }!!.first
             val xC = centroid(simplexPoints, h)
-            val fXc = f.evaluate(xC)
+            val fXc = f.invoke(xC)
 
             return Math.sqrt((1.0 / simplexPoints.size) *
                     (0..simplexPoints.size - 1)
-                            .map { Math.pow(f.evaluate(simplexPoints[it]) - fXc, 2.0) }
+                            .map { Math.pow(f.invoke(simplexPoints[it]) - fXc, 2.0) }
                             .sum()) < epsilon
         }
 
@@ -74,29 +74,29 @@ class NelderMeadSimplex {
             do {
                 val simplexPointsValuesByIndex = (0..simplexPoints.size-1)
                         .zip(simplexPoints)
-                        .map { (i, xi) -> Pair(i, f.evaluate(xi)) }
+                        .map { (i, xi) -> Pair(i, f.invoke(xi)) }
 
                 h = simplexPointsValuesByIndex.maxBy { it.second }!!.first
                 l = simplexPointsValuesByIndex.minBy { it.second }!!.first
                 val xC = centroid(simplexPoints, h)
-                var fXc = f.evaluate(xC)
+                var fXc = f.invoke(xC)
                 val xR = reflect(xC, simplexPoints[h], alpha)
-                val fXR = f.evaluate(xR)
-                if(fXR.compareTo(f.evaluate(simplexPoints[l])) < 0) {
+                val fXR = f.invoke(xR)
+                if(fXR.compareTo(f.invoke(simplexPoints[l])) < 0) {
                     val xE = expand(xC, xR, gamma)
-                    if(f.evaluate(xE).compareTo(f.evaluate(simplexPoints[l])) < 0) {
+                    if(f.invoke(xE).compareTo(f.invoke(simplexPoints[l])) < 0) {
                         simplexPoints[h] = xE
                     } else {
                         simplexPoints[h] = xR
                     }
                 } else {
                     if((0..simplexPoints.size - 1).filter { it.compareTo(h) != 0 }
-                            .all { fXR.compareTo(f.evaluate(simplexPoints[it])) > 0 }) {
-                        if(fXR.compareTo(f.evaluate(simplexPoints[h])) < 0) {
+                            .all { fXR.compareTo(f.invoke(simplexPoints[it])) > 0 }) {
+                        if(fXR.compareTo(f.invoke(simplexPoints[h])) < 0) {
                             simplexPoints[h] = xR
                         }
                         val xK = contract(xC, simplexPoints[h], beta)
-                        if(f.evaluate(xK).compareTo(f.evaluate(simplexPoints[h])) < 0) {
+                        if(f.invoke(xK).compareTo(f.invoke(simplexPoints[h])) < 0) {
                             simplexPoints[h] = xK
                         } else {
                             (0..simplexPoints.size - 1)

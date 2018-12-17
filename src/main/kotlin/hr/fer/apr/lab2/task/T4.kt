@@ -1,6 +1,6 @@
 package hr.fer.apr.lab2.task
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 import hr.fer.apr.lab2.algorithm.NelderMeadSimplex
 import hr.fer.apr.lab2.function.F1
 

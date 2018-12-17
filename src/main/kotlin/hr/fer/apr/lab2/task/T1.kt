@@ -1,20 +1,14 @@
 package hr.fer.apr.lab2.task
 
-import hr.fer.apr.lab1.util.Matrix
+import hr.fer.apr.util.Matrix
 import hr.fer.apr.lab2.algorithm.CoordinateAxisSearch
 import hr.fer.apr.lab2.algorithm.HookeJeeves
 import hr.fer.apr.lab2.algorithm.NelderMeadSimplex
 import hr.fer.apr.lab2.function.MultivariableFunction
 
-class FT1: MultivariableFunction {
+class FT1: MultivariableFunction() {
 
-    var numberOfCalls = 0
-
-    override fun numberOfCalls(): Int {
-        return numberOfCalls
-    }
-
-    override fun evaluate(x: Matrix): Double {
+    override fun invoke(x: Matrix): Double {
         numberOfCalls++
         return Math.pow(x[0] - 3, 2.0)
     }
