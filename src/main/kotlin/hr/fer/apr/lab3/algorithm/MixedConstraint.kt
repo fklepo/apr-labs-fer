@@ -1,5 +1,6 @@
 package hr.fer.apr.lab3.algorithm
 
+import hr.fer.apr.lab2.algorithm.HookeJeeves
 import hr.fer.apr.lab2.function.MultivariableFunction
 import hr.fer.apr.lab3.function.DifferentiableFunction
 import hr.fer.apr.lab3.util.EqualityConstraint
@@ -31,36 +32,57 @@ class MixedConstraint {
             }
         }
 
+        fun innerPoint(implicitConstraints: List<ImplicitConstraint>, t: Double = T): MultivariableFunction {
+            return object : MultivariableFunction() {
+                override fun invoke(x: Matrix): Double {
+                    numberOfCalls++
+                    return - implicitConstraints.map { t * it(x) }.filter { it < 0 }.sum()
+                }
+            }
+        }
+
         public fun evaluate(f: DifferentiableFunction,
                             start: Matrix,
                             implicitConstraints: List<ImplicitConstraint>,
                             equalityConstraints: List<EqualityConstraint>,
+                            dx: Double = HookeJeeves.D_X,
                             e: Double = E,
                             t: Double = T,
                             verbose: Boolean = false): Matrix {
 
-            val xPrev: Matrix = start
-            val xCur: Matrix = start
+            var prevX: Matrix = start
+            var curX: Matrix = start
+            if (implicitConstraints.map { it(start) }.any { it < 0 }) {
+                curX = HookeJeeves.evaluate(innerPoint(implicitConstraints, t), start, dx)
+                prevX = curX
+                if (verbose) {
+                    println("New start point:" + curX)
+                }
+            }
+            var curT = t
             do {
+                prevX = curX
+                curX = HookeJeeves.evaluate(mixedFunction(f, implicitConstraints, equalityConstraints, t), prevX, dx)
+                curT *= 10
+            } while((0..curX.size().first-1).map { Math.abs(curX[it] - prevX[it]) }.any { it > e })
 
-            } while((0..xCur.size().first-1).map { Math.abs(xCur[it] - xPrev[it]) }.any { it > e })
-
-            return xCur
+            return curX
         }
 
         fun evaluate(f: DifferentiableFunction,
                      propertiesPath: String,
                      implicitConstraints: List<ImplicitConstraint>,
-                     equalityConstraints: List<EqualityConstraint>): Matrix {
+                     equalityConstraints: List<EqualityConstraint>,
+                     dx: Double): Matrix {
             val propertiesMap: Map<String, String> = InputParser.readPropertiesFile(propertiesPath)
 
             val start = InputParser.readVector(propertiesMap["start"]!!)
             val e = Optional.ofNullable(propertiesMap["e"]).toDouble().orElseGet { E }
             val t = Optional.ofNullable(propertiesMap["t"]).map { it.toDouble() }.orElseGet({ T })
+            val dX = Optional.ofNullable(propertiesMap.get("dX")).toDouble().orElse(HookeJeeves.D_X)
             val verbose = Optional.ofNullable(propertiesMap["verbose"]).map { it.toBoolean() }.orElseGet({ false })
 
-            return evaluate(f, start, implicitConstraints, equalityConstraints, e, t, verbose)
+            return evaluate(f, start, implicitConstraints, equalityConstraints, dx, e, t, verbose)
         }
     }
-
 }

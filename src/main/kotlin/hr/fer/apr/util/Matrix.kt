@@ -364,7 +364,7 @@ class Matrix {
     }
 
     override fun toString(): String {
-        if (this.size().second == 1) {
+        if (this.size().second == 1 && this.size().first > 1) {
             return this.transpose().toString()
         }
         return elems.map { it.joinToString(separator = " ") }.joinToString(separator = System.lineSeparator())
