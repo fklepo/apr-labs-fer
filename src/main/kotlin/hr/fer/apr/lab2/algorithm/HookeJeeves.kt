@@ -6,11 +6,12 @@ import hr.fer.apr.util.InputParser
 import hr.fer.apr.util.toDouble
 import java.util.*
 
-val D_X = 1.0
-val HE_X = 1e-6
-
 class HookeJeeves {
+
     companion object {
+        val D_X = 1.0
+        val HE_X = 1e-6
+
         private fun explore(f: MultivariableFunction, xP: Matrix, dX: Double): Matrix {
             val x = xP.copy()
             for(i in (0..xP.size().first - 1)) {
@@ -59,7 +60,7 @@ class HookeJeeves {
                     dXc /= 2
                     xPc = xBc.copy()
                 }
-            } while(dXc.compareTo(0.25) > 0)
+            } while(dXc.compareTo(HE_X) > 0)
 
             return xBc
         }
