@@ -363,6 +363,10 @@ class Matrix {
                 .reduceRight({ cur, acc -> acc.concat(cur, vertically = true) })
     }
 
+    fun rawValue(): Array<DoubleArray> {
+        return deepCopy(elems)
+    }
+
     override fun toString(): String {
         if (this.size().second == 1 && this.size().first > 1) {
             return this.transpose().toString()

@@ -15,8 +15,18 @@ fun main(args: Array<String>) {
     val f1 = F1()
     println(MixedConstraint.evaluate(f1, x0, implicits, emptyList<EqualityConstraint>()))
 
+    println("F1'")
+    var x02 = Matrix.vector(2.3, 4.2)
+    val f12 = F1()
+    println(MixedConstraint.evaluate(f12, x02, implicits, emptyList<EqualityConstraint>()))
+
     println("F2")
     x0 = Matrix.vector(0.1, 0.3)
     val f2 = F2()
     println(MixedConstraint.evaluate(f2, x0, implicits, emptyList<EqualityConstraint>()))
+
+    println("F2'")
+    x02 = Matrix.vector(5.4, 4.3)
+    val f22 = F2()
+    println(MixedConstraint.evaluate(f22, x02, implicits, emptyList<EqualityConstraint>()))
 }
