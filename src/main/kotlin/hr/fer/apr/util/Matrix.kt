@@ -2,6 +2,7 @@ package hr.fer.apr.util
 
 import java.io.File
 import java.lang.IllegalArgumentException
+import java.lang.RuntimeException
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
@@ -251,12 +252,18 @@ class Matrix {
             throw IllegalArgumentException("Vector y's dimension is not appropriate for this matrix.")
         }
 
+        if (Math.abs(this[size().first - 1, size().first - 1]) < EPSILON) {
+            throw RuntimeException("Pivot is zero!")
+        }
         val x = Matrix(arrayOf(DoubleArray(size().first))).transpose()
         x[size().first - 1] = y[size().first - 1] / this[size().first - 1, size().first - 1]
 
         IntRange(0, size().first - 2)
                 .reversed()
                 .forEach { row ->
+                    if (Math.abs(this[row, row]) < EPSILON) {
+                        throw RuntimeException("Pivot is zero!")
+                    }
                     x[row] = (y[row] -
                                 IntRange(row + 1, size().first - 1)
                                         .map { col -> this[row, col] * x[col]}
@@ -345,22 +352,23 @@ class Matrix {
         }
     }
 
-    fun inverse(): Matrix? {
+    fun inverse(): Matrix {
         val size = size()
         if (size.first != size.second) {
             throw java.lang.UnsupportedOperationException("Inverse is defined for square matrices only!")
         }
-        // A * A^-1 = I
+        // A * A^-1 = E
         // A * xi = Ei
         // X = [x1, ..., xn] = A^-1
         val lupDecompose = this.lupDecompose()
         return (0..size.first-1)
                 .map { Matrix.identity(size.first).getColAsMatrix(it) }
                 .map {
-                    val y = lupDecompose.first.forwardSubstitution(lupDecompose.second * it)
-                    lupDecompose.first.backSubstitution(y)
+                    val y = lupDecompose.first.forwardSubstitution(lupDecompose.second*it)
+                    val backSubstitution = lupDecompose.first.backSubstitution(y)
+                    backSubstitution
                 }
-                .reduceRight({ cur, acc -> acc.concat(cur, vertically = true) })
+                .reduce({ acc, cur -> acc.concat(cur, vertically = true) })
     }
 
     fun rawValue(): Array<DoubleArray> {
